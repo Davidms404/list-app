@@ -4,7 +4,6 @@ const TaskSchema = new Schema({
   title: {
     type: String,
     required: true,
-    unique: true,
     trim: true
   },
   description: {
@@ -14,6 +13,10 @@ const TaskSchema = new Schema({
   done: {
     type: Boolean, 
     default: false
+  },
+  user: {
+    type: String,
+    required: true
   },
 }, {
   timestamps: true,

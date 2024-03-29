@@ -1,4 +1,5 @@
-const Task = require("../src/models/Task.js");
+const Task = require('../src/models/Task.js');
+const User = require('../src/models/User.js');
 
 module.exports.createNewTask = async (req, res) => {
   try {
@@ -6,45 +7,49 @@ module.exports.createNewTask = async (req, res) => {
     const savedTask = await task.save();
     res.status(201).json(savedTask);
   } catch (error) {
-    res.status(400).json({ "error": error.message });
+    res.status(400).json({ error: error.message });
   }
 }
 
 module.exports.getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find();
+    const {userId } = req.params;
+    const tasks = await Task.find({ user: userId });
     res.json(tasks);
   } catch (error) {
-    res.status(500).json({ "error": error.message });
+    res.status(500).json({ error: error.message });
   }
 }
 
 module.exports.editTask = async (req, res) => {
   try {
-    const { id } = req.params;
-    const updatedTask = await Task.updateOne({ _id: id }, req.body);
+    const { userId, id } = req.params;
+    const updatedTask = await Task.findOneAndUpdate({ _id: id, user: userId }, req.body);
 
     if (!updatedTask) {
-      return res.status(404).json({"error": "Task not found"});
+      return res.status(404).json({ error: "Task not found" });
     }
 
     res.json(updatedTask);
   } catch (error) {
-    res.status(500).json({"error": error.message});
+    res.status(500).json({ error: error.message });
   }
 } 
 
 module.exports.deleteTask = async (req, res) => {
   try {
-    const { id } = req.params;
-    const deletedTask = await Task.findByIdAndDelete(id);
+    const { userId, id } = req.params;
+    console.log('user: ', userId);
+    console.log('tarea: ', id);
+    const deletedTask = await Task.findOneAndDelete({ _id: id, user: userId });
+    console.log('tarea eliminada: ', deletedTask);
 
     if (!deletedTask) {
-      return res.status(404).json({"error": "Task not found"});
+      return res.status(404).json({ error: "Task not found" });
     }
 
-    res.json({"message": "Task deleted successfully"});
+    res.json({ message: "Task deleted successfully" });
   } catch (error) {   
-    res.status(500).json({"error": error.message});
+    res.status(500).json({ error: error.message });
   }
 }
